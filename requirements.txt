@@ -1,3 +1,4 @@
+--constraint constraints.txt
 fastapi==0.104.1
 uvicorn==0.23.0
 python-dotenv==1.0.0
@@ -10,3 +11,6 @@ typing-inspect==0.8.0
 SQLAlchemy==2.0.40
 httpx==0.27.0
 langflow @ git+https://github.com/langflow-ai/langflow.git@main
+astrapy==0.7.0
+assemblyai==0.35.1
+chromadb==0.5.23
