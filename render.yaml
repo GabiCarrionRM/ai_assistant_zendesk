@@ -17,15 +17,31 @@ services:
     value: "false"
   region: oregon
   buildCommand: |
+    # Step 1: Install pip-based packages
+    pip install --upgrade pip
+    pip install \
+      fastapi==0.95.2 \
+      uvicorn==0.23.0 \
+      python-dotenv==1.0.0 \
+      pydantic==1.10.8 \
+      langchain==0.0.267 \
+      astrapy==0.7.0 \
+      tiktoken==0.5.0 \
+      langchain-openai==0.0.2 \
+      langchain-astradb \
+      openai==0.28.1 \
+      typing-inspect==0.8.0 \
+      typing-extensions==4.5.0 \
+      SQLAlchemy==2.0.19
+
+    # Step 2: Install Langflow via UV (to avoid long install or version bugs)
     pip install uv
-    uv pip install -r requirements.txt
-    
-    # Optional patch step
+    uv pip install git+https://github.com/langflow-ai/langflow.git@main --no-deps
+
+    # Step 3: Patch Langflow if needed
     if [ -f patch_langflow.py ]; then
       python -c "import sys; sys.path.append('.'); import patch_langflow" || echo "Skipping patch_langflow.py due to errors"
     fi
-
-    uv pip list
 
   startCommand: python startup_wrapper.py
 version: "1"
