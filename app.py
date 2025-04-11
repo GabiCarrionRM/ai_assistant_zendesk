@@ -1,26 +1,58 @@
 import os
-import sys
-import importlib
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
-# Apply the SQLite fix BEFORE any other imports
-# This is the recommended approach from Chroma documentation
-try:
-    __import__('pysqlite3')
-    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-    print("Successfully replaced sqlite3 with pysqlite3")
-except ImportError:
-    print("pysqlite3 not available, using built-in sqlite3")
+# Create a basic FastAPI app
+app = FastAPI(title="AI Assistant Zendesk")
 
-# Now import Langflow after SQLite fix
-from langflow.server import create_app
+# Add some basic routes
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    return """
+    <html>
+        <head>
+            <title>AI Assistant</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+                h1 { color: #333; }
+                .container { max-width: 800px; margin: 0 auto; }
+                .info { background-color: #f8f9fa; padding: 20px; border-radius: 5px; }
+                .error { color: #721c24; background-color: #f8d7da; padding: 20px; border-radius: 5px; }
+                .success { color: #155724; background-color: #d4edda; padding: 20px; border-radius: 5px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>AI Assistant Zendesk</h1>
+                <div class="success">
+                    <h2>Service is running</h2>
+                    <p>The base service is operational.</p>
+                </div>
+                <div class="info">
+                    <h2>About this deployment</h2>
+                    <p>This is a minimal deployment due to SQLite version compatibility issues with ChromaDB in the Render environment.</p>
+                    <p>Full Langflow functionality that depends on ChromaDB is currently unavailable.</p>
+                </div>
+            </div>
+        </body>
+    </html>
+    """
 
-# Get the port from environment variable
-port = int(os.environ.get("PORT", 7860))
+# Health check endpoint for Render
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
-# Create the FastAPI app
-app = create_app()
-
-# Langflow will handle the serving through its internal setup
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=port)
+# Add more API endpoints as needed
+@app.get("/api/info")
+async def api_info():
+    return {
+        "version": "1.0.0",
+        "name": "AI Assistant API",
+        "status": "operational",
+        "limitations": [
+            "ChromaDB functionality is disabled due to SQLite version compatibility"
+        ]
+    }

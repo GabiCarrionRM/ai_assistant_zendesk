@@ -7,7 +7,11 @@ services:
   envVars:
   - key: LANGFLOW_API_KEY
     sync: false
+  - key: PYTHONPATH
+    value: .
+  - key: PYTHONUNBUFFERED
+    value: "1"
   region: oregon
-  buildCommand: pip install -r requirements.txt
-  startCommand: python app.py
+  buildCommand: pip install -r requirements.txt && chmod +x startup_wrapper.py
+  startCommand: python startup_wrapper.py
 version: "1"
