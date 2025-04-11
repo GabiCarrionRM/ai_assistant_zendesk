@@ -17,29 +17,28 @@ services:
     value: "false"
   region: oregon
   buildCommand: |
-    # Install uv first using pip
     pip install uv
-    
-    # Install core dependencies ensuring compatibility
-    uv pip install fastapi==0.95.2 uvicorn==0.23.0 python-dotenv==1.0.0 pydantic==1.10.8
-    
-    # Install langchain and related packages
-    uv pip install langchain==0.0.267 astrapy==0.7.0 tiktoken==0.5.0
-    
-    # Install specific langchain integrations
-    uv pip install langchain-openai==0.0.2
-    uv pip install langchain-astradb
-    
-    # Install older OpenAI version known to work
-    uv pip install openai==0.28.1
-    
-    # Install langflow (0.5.7 version)
-    uv pip install git+https://github.com/langflow-ai/langflow.git@0.5.7 --no-deps
-    uv pip install typing-inspect==0.8.0 typing-extensions==4.5.0 SQLAlchemy==2.0.19
-    
-    # Fix the patch_langflow.py file if needed and run it
+
+    uv pip install \
+      fastapi==0.95.2 \
+      uvicorn==0.23.0 \
+      python-dotenv==1.0.0 \
+      pydantic==1.10.8 \
+      langchain==0.0.267 \
+      astrapy==0.7.0 \
+      tiktoken==0.5.0 \
+      langchain-openai==0.0.2 \
+      langchain-astradb \
+      openai==0.28.1 \
+      git+https://github.com/langflow-ai/langflow.git@0.5.7 --no-deps \
+      typing-inspect==0.8.0 \
+      typing-extensions==4.5.0 \
+      SQLAlchemy==2.0.19
+
+    # Optional patch if needed
     if [ -f patch_langflow.py ]; then
       python -c "import sys; sys.path.append('.'); import patch_langflow" || echo "Skipping patch_langflow.py due to errors"
     fi
+
   startCommand: python startup_wrapper.py
 version: "1"
