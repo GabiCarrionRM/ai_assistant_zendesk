@@ -1,7 +1,8 @@
 fastapi>=0.95.2
 uvicorn>=0.23.0
 python-dotenv>=1.0.0
-langflow==0.6.4
+# Install langflow directly from GitHub
+git+https://github.com/langflow-ai/langflow.git@dev
 langchain>=0.0.267
 langchain-openai>=0.0.2
 langchain-astradb>=0.0.3

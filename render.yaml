@@ -16,6 +16,15 @@ services:
   - key: LANGCHAIN_TRACING
     value: "false"
   region: oregon
-  buildCommand: pip install uv && uv pip install --prerelease=allow -r requirements.txt && python -m patch_langflow
+  buildCommand: |
+    pip install uv
+    uv pip install --prerelease=allow -r requirements.txt
+    # Fallback to regular pip if uv fails
+    if [ $? -ne 0 ]; then
+      echo "uv install failed, falling back to regular pip"
+      pip install git+https://github.com/langflow-ai/langflow.git@dev
+      pip install -r requirements.txt
+    fi
+    python -m patch_langflow
   startCommand: python startup_wrapper.py
 version: "1"
