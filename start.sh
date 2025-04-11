@@ -1,8 +1,13 @@
 #!/bin/bash
+set -e
 
-# Explicitly set environment variable to use in-memory Chroma
-export LANGCHAIN_CHROMA_IMPL="in-memory"
+# Set environment variables to avoid SQLite issues
 export LANGCHAIN_TRACING="false"
 
-# Run the application
+# Print SQLite version info
+echo "Checking SQLite version..."
+python -c "import sqlite3; print(f'SQLite version: {sqlite3.sqlite_version}')"
+
+# Try to patch if needed
+echo "Running the application with patching..."
 python app.py

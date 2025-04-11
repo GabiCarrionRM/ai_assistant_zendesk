@@ -7,11 +7,11 @@ services:
   envVars:
   - key: LANGFLOW_API_KEY
     sync: false
-  - key: LANGCHAIN_CHROMA_IMPL
-    value: in-memory
   - key: LANGCHAIN_TRACING
     value: "false"
+  - key: LANGFLOW_BACKEND_DEBUG
+    value: "true"
   region: oregon
-  buildCommand: pip install -r requirements.txt
-  startCommand: python minimal_app.py
+  buildCommand: pip install -r requirements.txt && chmod +x start.sh && chmod +x patch_chroma.py
+  startCommand: bash start.sh
 version: "1"
