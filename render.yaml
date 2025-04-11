@@ -7,7 +7,11 @@ services:
   envVars:
   - key: LANGFLOW_API_KEY
     sync: false
+  - key: LANGCHAIN_CHROMA_IMPL
+    value: in-memory
+  - key: LANGCHAIN_TRACING
+    value: "false"
   region: oregon
   buildCommand: pip install -r requirements.txt
-  startCommand: python app.py
+  startCommand: python minimal_app.py
 version: "1"

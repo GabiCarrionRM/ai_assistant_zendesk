@@ -1,12 +1,12 @@
 import os
 import sys
-import importlib.util
+import importlib
 
-# Fix for SQLite version issue
-__import__('pysqlite3')
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# Configure environment variables to use in-memory storage for Chroma
+os.environ["LANGCHAIN_CHROMA_IMPL"] = "in-memory"
+os.environ["LANGCHAIN_TRACING"] = "false"
 
-# Now import langflow after SQLite fix
+# Now we can safely import langflow
 from langflow.server import create_app
 
 # Get the port from environment variable
