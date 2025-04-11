@@ -7,11 +7,7 @@ services:
   envVars:
   - key: LANGFLOW_API_KEY
     sync: false
-  - key: LANGCHAIN_TRACING
-    value: "false"
-  - key: LANGFLOW_BACKEND_DEBUG
-    value: "true"
   region: oregon
-  buildCommand: pip install -r requirements.txt && chmod +x start.sh && chmod +x patch_chroma.py
-  startCommand: bash start.sh
+  buildCommand: pip install -r requirements.txt
+  startCommand: python app.py
 version: "1"
