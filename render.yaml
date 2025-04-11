@@ -18,27 +18,14 @@ services:
   region: oregon
   buildCommand: |
     pip install uv
-
-    uv pip install \
-      fastapi==0.95.2 \
-      uvicorn==0.23.0 \
-      python-dotenv==1.0.0 \
-      pydantic==1.10.8 \
-      langchain==0.0.267 \
-      astrapy==0.7.0 \
-      tiktoken==0.5.0 \
-      langchain-openai==0.0.2 \
-      langchain-astradb \
-      openai==0.28.1 \
-      git+https://github.com/langflow-ai/langflow.git@0.5.7 --no-deps \
-      typing-inspect==0.8.0 \
-      typing-extensions==4.5.0 \
-      SQLAlchemy==2.0.19
-
-    # Optional patch if needed
+    uv pip install -r requirements.txt
+    
+    # Optional patch step
     if [ -f patch_langflow.py ]; then
       python -c "import sys; sys.path.append('.'); import patch_langflow" || echo "Skipping patch_langflow.py due to errors"
     fi
+
+    uv pip list
 
   startCommand: python startup_wrapper.py
 version: "1"
