@@ -40,6 +40,20 @@ def run_with_patched_modules():
     
     # Also mock langchain_chroma
     sys.modules['langchain_chroma'] = MockChromaModule()
+
+    # Ensure flow directory exists
+    flows_dir = Path("flows")
+    flows_dir.mkdir(exist_ok=True)
+
+    # Copy the provided flow data to the correct location
+    zendesk_flow_path = Path("Zendesk AI Chat.json")
+    if zendesk_flow_path.exists():
+        print("Found Zendesk AI Chat.json, copying to flows/default_chat.json")
+        with open(zendesk_flow_path, "r") as src:
+            with open(flows_dir / "default_chat.json", "w") as dst:
+                dst.write(src.read())
+    else:
+        print("Warning: Zendesk AI Chat.json not found in the root directory")
     
     # Print out all installed packages for debugging
     print("Installed packages:")
@@ -49,6 +63,17 @@ def run_with_patched_modules():
     
     # Run the actual application
     from app import app
+    
+    # Set required environment variables
+    if "OPENAI_API_KEY" in os.environ:
+        print("Found OPENAI_API_KEY in environment")
+    else:
+        print("Warning: OPENAI_API_KEY not found in environment")
+    
+    if "ASTRA_DB_APPLICATION_TOKEN" in os.environ:
+        print("Found ASTRA_DB_APPLICATION_TOKEN in environment")
+    else:
+        print("Warning: ASTRA_DB_APPLICATION_TOKEN not found in environment")
     
     # Return the app for ASGI servers
     return app

@@ -5,13 +5,17 @@ services:
   repo: https://github.com/GabiCarrionRM/ai_assistant_zendesk
   plan: starter
   envVars:
-  - key: LANGFLOW_API_KEY
+  - key: OPENAI_API_KEY
+    sync: false
+  - key: ASTRA_DB_APPLICATION_TOKEN
     sync: false
   - key: PYTHONPATH
     value: .
   - key: PYTHONUNBUFFERED
     value: "1"
+  - key: LANGCHAIN_TRACING
+    value: "false"
   region: oregon
-  buildCommand: pip install -r requirements.txt && chmod +x startup_wrapper.py
+  buildCommand: pip install -r requirements.txt && python -m patch_langflow
   startCommand: python startup_wrapper.py
 version: "1"
