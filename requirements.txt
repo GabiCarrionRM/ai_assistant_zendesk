@@ -10,6 +10,8 @@ tiktoken==0.5.2
 astrapy==0.7.0
 SQLAlchemy==2.0.40
 typing-inspect==0.8.0
+httpx==0.25.1
+
 
 # ✅ Langflow with no plugin deps
 langflow @ git+https://github.com/langflow-ai/langflow.git@main#egg=langflow&subdirectory=.
