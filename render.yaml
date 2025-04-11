@@ -18,11 +18,18 @@ services:
   region: oregon
   buildCommand: |
     pip install uv
+    
     uv pip install -r requirements.txt --prerelease=allow
+    
     uv pip install openai==0.28.1
     uv pip install git+https://github.com/langflow-ai/langflow.git@0.5.7
-    uv pip install langchain-openai==0.0.2
-    uv pip install langchain-astradb==0.0.3
-    python -m patch_langflow
+    uv pip install langchain-openai
+    uv pip install langchain-astradb
+    
+    if [ -f patch_langflow.py ]; then
+      sed -i 's/f.write("""/f.write("""/' patch_langflow.py
+    fi
+    
+    python -c "import sys; sys.path.append('.'); import patch_langflow" || echo "Skipping patch_langflow.py due to errors"
   startCommand: python startup_wrapper.py
 version: "1"
