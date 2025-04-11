@@ -8,6 +8,9 @@ from fastapi.templating import Jinja2Templates
 from typing import Dict, Any, Optional
 import uvicorn
 from langflow import get_flow_from_json
+from langchain.llms import OpenAI
+
+llm = OpenAI(openai_api_key=os.environ["OPENAI_API_KEY"])
 
 # Set environment variable to avoid SQLite issues
 os.environ["LANGCHAIN_TRACING"] = "false"
