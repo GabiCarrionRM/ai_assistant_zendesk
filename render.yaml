@@ -16,6 +16,6 @@ services:
   - key: LANGCHAIN_TRACING
     value: "false"
   region: oregon
-  buildCommand: pip install -r requirements.txt && python -m patch_langflow
+  buildCommand: pip install uv && uv pip install -r requirements.txt && python -m patch_langflow
   startCommand: python startup_wrapper.py
 version: "1"
