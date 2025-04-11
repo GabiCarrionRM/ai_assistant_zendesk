@@ -1,3 +1,4 @@
 langflow>=0.5.3
 uvicorn>=0.23.0
 python-dotenv>=1.0.0
+pysqlite3-binary
