@@ -1,30 +1,11 @@
 services:
-- type: web
-  name: ai_assistant_zendesk
-  runtime: python
-  repo: https://github.com/GabiCarrionRM/ai_assistant_zendesk
-  plan: starter
-  envVars:
-  - key: OPENAI_API_KEY
-    sync: false
-  - key: ASTRA_DB_APPLICATION_TOKEN
-    sync: false
-  - key: PYTHONPATH
-    value: .
-  - key: PYTHONUNBUFFERED
-    value: "1"
-  - key: LANGCHAIN_TRACING
-    value: "false"
-  region: oregon
-  buildCommand: |
-    pip install --upgrade pip
-    pip install -r requirements.txt
-
-    if [ -f patch_langflow.py ]; then
-      python -c "import sys; sys.path.append('.'); import patch_langflow" || echo "Skipping patch_langflow.py due to errors"
-    fi
-
-
-
-  startCommand: python startup_wrapper.py
-version: "1"
+  - type: web
+    name: langflow-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app -k uvicorn.workers.UvicornWorker --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: FLOW_PATH
+        value: flow.json
