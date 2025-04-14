@@ -1,19 +1,16 @@
-FROM python:3.10.8-slim
+FROM python:3.10-slim
 
 WORKDIR /app
 
-# Copy requirements first for better caching
+# Copy requirements and install dependencies
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install uv and use it to install dependencies
-RUN pip install uv && \
-    uv pip install --system -r requirements.txt
-
-# Copy application code
+# Copy the rest of the application
 COPY . .
 
-# Expose the port the app runs on
+# Expose the port
 EXPOSE 8000
 
-# Command to run the application
+# Run the application
 CMD ["gunicorn", "app:app", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--timeout", "120"]
