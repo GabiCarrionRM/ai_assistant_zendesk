@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Langflow Bridge</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .status-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .config-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .config-item strong {
+            display: inline-block;
+            width: 120px;
+        }
+        .test-area {
+            margin-top: 30px;
+        }
+        .input-area {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .input-area input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+        .input-area button {
+            background-color: #0084ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        .response-area {
+            min-height: 100px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .api-url {
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Langflow Bridge</h1>
+            <p>API Gateway for your Langflow Flows</p>
+        </div>
+        
+        <div class="status-card">
+            <h2>Configuration</h2>
+            <div class="config-item">
+                <strong>Flow ID:</strong> <span id="flow-id">{{ flow_id or "Not configured" }}</span>
+            </div>
+            <div class="config-item">
+                <strong>Langflow API:</strong> <span id="api-url" class="api-url">{{ api_url }}</span>
+            </div>
+            <div class="config-item">
+                <strong>Status:</strong> <span id="status">Checking...</span>
+            </div>
+        </div>
+        
+        <div class="status-card">
+            <h2>API Information</h2>
+            <div class="config-item">
+                <strong>Endpoint:</strong> <code>/process</code>
+            </div>
+            <div class="config-item">
+                <strong>Method:</strong> <code>POST</code>
+            </div>
+            <div class="config-item">
+                <strong>Payload:</strong> <code>{ "input": "Your message here" }</code>
+            </div>
+            <div class="config-item">
+                <strong>Response:</strong> <code>{ "response": "AI response here" }</code>
+            </div>
+        </div>
+        
+        <div class="status-card test-area">
+            <h2>Test Your API</h2>
+            <div class="input-area">
+                <input type="text" id="test-input" placeholder="Type a message to test...">
+                <button id="test-button">Send</button>
+            </div>
+            <h3>Response:</h3>
+            <div class="response-area" id="test-response">
+                Response will appear here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check the health status on page load
+        fetch('/health')
+            .then(response => response.json())
+            .then(data => {
+                const statusElement = document.getElementById('status');
+                if (data.status === 'healthy') {
+                    statusElement.textContent = 'Connected and Healthy';
+                    statusElement.style.color = 'green';
+                } else {
+                    statusElement.textContent = `Warning: ${data.message}`;
+                    statusElement.style.color = 'orange';
+                }
+            })
+            .catch(error => {
+                document.getElementById('status').textContent = `Error: ${error.message}`;
+                document.getElementById('status').style.color = 'red';
+            });
+        
+        // Handle test button click
+        document.getElementById('test-button').addEventListener('click', function() {
+            const inputValue = document.getElementById('test-input').value.trim();
+            const responseArea = document.getElementById('test-response');
+            
+            if (!inputValue) {
+                responseArea.textContent = 'Please enter a message to test.';
+                return;
+            }
+            
+            responseArea.textContent = 'Loading...';
+            
+            fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ input: inputValue })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server responded with status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                responseArea.textContent = data.response;
+            })
+            .catch(error => {
+                responseArea.textContent = `Error: ${error.message}`;
+            });
+        });
+    </script>
+</body>
+</html>
