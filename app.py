@@ -64,40 +64,59 @@ async def process_input(request: Request):
     data = await request.json()
     user_input = data.get("input", "")
     
-    if not flow_data:
+    # Check if we're in development/debug mode
+    debug_mode = os.getenv("DEBUG_MODE", "false").lower() == "true"
+    
+    if not flow_data and not debug_mode:
         logger.error("Flow not initialized")
         raise HTTPException(status_code=500, detail="Flow not initialized")
     
     try:
-        # Instead of loading the flow directly, we'll use the Langflow API
-        # Assuming you have a Langflow instance running elsewhere
-        langflow_api_url = os.getenv("LANGFLOW_API_URL", "https://api.langflow.com")
+        # If we're in debug mode, return a test response
+        if debug_mode:
+            logger.info(f"Debug mode: returning test response for input: {user_input}")
+            return {"response": f"DEBUG MODE: I received your message: '{user_input}'. This is a test response since Langflow API is not configured."}
         
-        # Prepare the payload for Langflow API
-        payload = {
-            "flow": flow_data,
-            "inputs": {
-                "input": user_input
+        # Try to use Langflow API if available
+        try:
+            langflow_api_url = os.getenv("LANGFLOW_API_URL")
+            
+            # If no API URL is set, use fallback mode
+            if not langflow_api_url:
+                logger.warning("No LANGFLOW_API_URL set, using fallback mode")
+                return {"response": f"I received your message: '{user_input}'. The Langflow API is not configured yet, so I'm providing this fallback response."}
+            
+            # Prepare the payload for Langflow API
+            payload = {
+                "flow": flow_data,
+                "inputs": {
+                    "input": user_input
+                }
             }
-        }
-        
-        # Call the Langflow API to process the flow
-        response = requests.post(
-            f"{langflow_api_url}/api/v1/process",
-            json=payload,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {os.getenv('LANGFLOW_API_KEY', '')}"
-            }
-        )
-        
-        if response.status_code != 200:
-            logger.error(f"Langflow API error: {response.text}")
-            raise HTTPException(status_code=response.status_code, detail=f"Langflow API error: {response.text}")
-        
-        result = response.json()
-        return {"response": result.get("output", "No response generated")}
-        
+            
+            # Call the Langflow API to process the flow
+            response = requests.post(
+                f"{langflow_api_url}/api/v1/process",
+                json=payload,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {os.getenv('LANGFLOW_API_KEY', '')}"
+                }
+            )
+            
+            if response.status_code != 200:
+                logger.error(f"Langflow API error: {response.text}")
+                # Use fallback in case of API error
+                return {"response": f"I received your message, but there was an issue processing it with the Langflow API. Here's a fallback response instead."}
+            
+            result = response.json()
+            return {"response": result.get("output", "No response generated")}
+            
+        except Exception as e:
+            logger.error(f"Error with Langflow API: {str(e)}")
+            # Use fallback in case of any exception
+            return {"response": f"I received your message: '{user_input}'. There was an issue connecting to the Langflow API, so I'm providing this fallback response."}
+            
     except Exception as e:
         logger.error(f"Error processing input: {str(e)}")
         logger.error(traceback.format_exc())
